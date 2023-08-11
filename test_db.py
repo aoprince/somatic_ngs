@@ -1,6 +1,6 @@
 import csv
 
-from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR, Float
+from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR, Float, insert
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dateutil.parser import parse
@@ -395,8 +395,8 @@ session = Session()
 
 import pandas as pd
 
-
-with open('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_picard_HsMetrics.txt', 'r') as file:
+# previous try at loading data, loaded everything into one column
+'''with open('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_picard_HsMetrics.txt', 'r') as file:
     data_df = pd.read_csv(file)
 data_df.to_sql('Picard_HsMetrics', con=engine, index=True, index_label='id', if_exists='replace')
 
@@ -410,4 +410,39 @@ data_df.to_sql('Picard_markduplicates', con=engine, index=True, index_label='id'
 
 with open('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_fastqc.txt', 'r') as file:
     data_df = pd.read_csv(file)
-data_df.to_sql('FastQC', con=engine, index=True, index_label='id', if_exists='replace')
+data_df.to_sql('FastQC', con=engine, index=True, index_label='id', if_exists='replace')'''
+
+#psudo code
+'''Picard_Metric = Picard_Metric(something that loops through each column)
+
+for row in file:
+    make into a list
+    return list
+'''
+
+#makes file contents into dictionary
+def dict_maker(file_name):
+    file = open(file_name, "r")
+    data = list(csv.DictReader(file, delimiter="\t"))
+    file.close()
+    return data
+
+Picard_Hs_dict = (dict_maker('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_picard_dups.txt'))
+
+
+#trying to put dictionary into table
+'''with engine.connect() as conn:
+    conn.execute(
+        text("INSERT INTO Picard_HsMetrics ()")
+    )
+    
+stmt = insert(Picard_HsMetrics).values([dict_maker('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_picard_dups.txt')])
+
+with engine.connect() as conn:
+    result = conn.execute(
+        insert(Picard_HsMetrics),
+        [
+            Picard_Hs_dict
+            ],
+    )
+    conn.commit()'''
