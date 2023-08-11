@@ -292,7 +292,6 @@ class samtools_flagstat(Base):
          {self.with_mate_mapped_to_a_different_chr_mapQ5_passed} {self.with_mate_mapped_to_a_different_chr_mapQ5_failed} {self.flagstat_total}"
 
 
-
 class Picard_markduplicates(Base):
     __tablename__ = "Picard_markduplicates"
 
@@ -327,8 +326,6 @@ class Picard_markduplicates(Base):
         return f"({self.Picard_markduplicates_id} {self.LIBRARY} {self.UNPAIRED_READS_EXAMINED} {self.READ_PAIRS_EXAMINED} {self.SECONDARY_OR_SUPPLEMENTARY_RDS} \
         {self.UNMAPPED_READS} {self.UNPAIRED_READ_DUPLICATES} {self.READ_PAIR_DUPLICATES} {self.READ_PAIR_OPTICAL_DUPLICATES} {self.PERCENT_DUPLICATION} \
         {self.ESTIMATED_LIBRARY_SIZE}" 
-
-
 
 
 class FastQC(Base):
@@ -393,23 +390,24 @@ engine = create_engine("sqlite:///mydb.db", echo=True)
 Base.metadata.create_all(bind=engine)
 
 Session = sessionmaker(bind=engine)
+session = Session()
 
 
-def parse_none(dt):
-    try:
-        return parse(dt)
-    except:
-        return None
-    
-def prepare_Picard_HsMetrics(row):
-    row["last_review"] = parse_none(row["last_review"])
-    return Picard_HsMetrics(**row)
+import pandas as pd
 
-with open('multiqc_picard_HsMetrics.txt', encoding='utf-8', newline='') as csv_file:
-    csvreader = csv.DictReader(csv_file, quotechar='"')
 
-    picard_hsmetrics = [prepare_Picard_HsMetrics(row) for row in csvreader]
+with open('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_picard_HsMetrics.txt', 'r') as file:
+    data_df = pd.read_csv(file)
+data_df.to_sql('Picard_HsMetrics', con=engine, index=True, index_label='id', if_exists='replace')
 
-    session = Session()
-    session.add_all(picard_hsmetrics)
-    session.commit()
+with open('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_samtools_flagstat.txt', 'r') as file:
+    data_df = pd.read_csv(file)
+data_df.to_sql('samtools_flagstat', con=engine, index=True, index_label='id', if_exists='replace')
+
+with open('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_picard_dups.txt', 'r') as file:
+    data_df = pd.read_csv(file)
+data_df.to_sql('Picard_markduplicates', con=engine, index=True, index_label='id', if_exists='replace')
+
+with open('/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_qc/PaedOnc23_12_132974_multiqc_report_data/multiqc_fastqc.txt', 'r') as file:
+    data_df = pd.read_csv(file)
+data_df.to_sql('FastQC', con=engine, index=True, index_label='id', if_exists='replace')
