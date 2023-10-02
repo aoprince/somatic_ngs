@@ -122,7 +122,7 @@ class Quality_files(Base):
     phsid = relationship('Picard_HsMetrics', back_populates="picard_hs_table")
     stfid = relationship('samtools_flagstat', back_populates="samtools_table")
     pmdid = relationship('Picard_markduplicates', back_populates="picard_md_table")
-    fqcid = relationship('FastQC', back_populates="fastqc_table")
+    fqcid = relationship('FastQC', back_populates="fastqc_table_id")
 
     def __repr__(self):
 
@@ -167,6 +167,7 @@ class Picard_HsMetrics(Base):
     ON_TARGET_BASES = Column("ON_TARGET_BASES", Float)
     PCT_PF_READS = Column("PCT_PF_READS", Float)
     PCT_PF_UQ_READS = Column("PCT_PF_UQ_READS", Float)
+    PCT_PF_UQ_READS_ALIGNED = Column("PCT_PF_UQ_READS_ALIGNED", Float)
     MEAN_TARGET_COVERAGE = Column("MEAN_TARGET_COVERAGE", Float)
     MEDIAN_TARGET_COVERAGE = Column("MEDIAN_TARGET_COVERAGE", Float)
     MAX_TARGET_COVERAGE = Column("MAX_TARGET_COVERAGE", Float)
@@ -191,7 +192,10 @@ class Picard_HsMetrics(Base):
     GC_DROPOUT = Column("GC_DROPOUT", Float)
     HET_SNP_SENSITIVITY = Column("HET_SNP_SENSITIVITY", Float)
     HET_SNP_Q = Column("HET_SNP_Q", Float)
-    SAMPLE_LIBRARY_READ_GROUP = Column("SAMPLE_LIBRARY_READ_GROUP", Float)
+    SAMPLE = Column("SAMPLE1", Float)
+    LIBRARY = Column("LIBRARY", Float)
+    READ_GROUP = Column("READ_GROUP", Float)
+
 
 # realtionship
     picard_hs_table =  relationship(
@@ -203,16 +207,17 @@ class Picard_HsMetrics(Base):
         {self.OFF_BAIT_BASES} {self.PCT_OFF_BAIT} {self.ON_BAIT_VS_SELECTED} {self.MEAN_BAIT_COVERAGE} {self.PCT_USABLE_BASES_ON_BAIT} {self.PCT_USABLE_BASES_ON_TARGET} \
         {self.FOLD_ENRICHMENT} {self.HS_LIBRARY_SIZE} {self.HS_PENALTY_10X} {self.HS_PENALTY_20X} {self.HS_PENALTY_30X} {self.HS_PENALTY_40X} {self.HS_PENALTY_50X} \
         {self.HS_PENALTY_100X} {self.TARGET_TERRITORY} {self.GENOME_SIZE} {self.TOTAL_READS} {self.PF_READS} {self.PF_BASES} {self.PF_UNIQUE_READS} {self.PF_UQ_READS_ALIGNED} \
-        {self.PF_BASES_ALIGNED} {self.MEAN_TARGET_COVERAGE} {self.MEDIAN_TARGET_COVERAGE} {self.MAX_TARGET_COVERAGE} {self.MIN_TARGET_COVERAGE} {self.ZERO_CVG_TARGETS_PCT} \
+        {self.PF_BASES_ALIGNED} {self.PCT_PF_UQ_READS_ALIGNED} {self.MEAN_TARGET_COVERAGE} {self.MEDIAN_TARGET_COVERAGE} {self.MAX_TARGET_COVERAGE} {self.MIN_TARGET_COVERAGE} {self.ZERO_CVG_TARGETS_PCT} \
         {self.PCT_EXC_DUPE} {self.PCT_EXC_ADAPTER} {self.PCT_EXC_MAPQ} {self.PCT_EXC_BASEQ} {self.PCT_EXC_OVERLAP} {self.PCT_EXC_OFF_TARGET} {self.FOLD_80_BASE_PENALTY} \
         {self.PCT_TARGET_BASES_1X} {self.PCT_TARGET_BASES_2X} {self.PCT_TARGET_BASES_10X} {self.PCT_TARGET_BASES_20X} {self.PCT_TARGET_BASES_30X} {self.PCT_TARGET_BASES_40X} \
-        {self.PCT_TARGET_BASES_50X} {self.PCT_TARGET_BASES_100X} {self.AT_DROPOUT} {self.GC_DROPOUT} {self.HET_SNP_SENSITIVITY} {self.HET_SNP_Q} {self.SAMPLE_LIBRARY_READ_GROUP}"
+        {self.PCT_TARGET_BASES_50X} {self.PCT_TARGET_BASES_100X} {self.AT_DROPOUT} {self.GC_DROPOUT} {self.HET_SNP_SENSITIVITY} {self.HET_SNP_Q} {self.SAMPLE} {self.LIBRARY} {self.READ_GROUP}"
 
 
 class samtools_flagstat(Base):
     __tablename__ = "samtools_flagstat"
 
     samtools_flagstat_id = Column("samtools_flagstat_id", Integer, primary_key=True)
+    Sample = Column("Sample", String)
     total_passed = Column("total_passed", Integer)
     total_failed = Column("total_failed", Integer)
     secondary_passed = Column("secondary_passed", Integer)
@@ -225,26 +230,26 @@ class samtools_flagstat(Base):
     mapped_failed = Column("mapped_failed", Integer)
     mapped_passed_pct = Column("mapped_passed_pct", Integer)
     mapped_failed_pct = Column("mapped_failed_pct", Integer)
-    paired_in_sequencing_passed = Column("paired_in_sequencing_passed", Integer)
-    paired_in_sequencing_failed = Column("paired_in_sequencing_failed", Integer)
+    paired_in_sequencing_passed = Column("paired in sequencing_passed", Integer)
+    paired_in_sequencing_failed = Column("paired in sequencing_failed", Integer)
     read1_passed = Column("read1_passed", Integer)
     read1_failed = Column("read1_failed", Integer)
     read2_passed = Column("read2_passed", Integer)
     read2_failed = Column("read2_failed", Integer)
-    properly_paired_passed = Column("properly_paired_passed", Integer)
-    properly_paired_failed = Column("properly_paired_failed", Integer)
-    properly_paired_passed_pct = Column("properly_paired_passed_pct", Integer)
-    properly_paired_failed_pct = Column("properly_paired_failed_pct", Integer)
-    with_itself_and_mate_mapped_passed = Column("with_itself_and_mate_mapped_passed", Integer)
-    with_itself_and_mate_mapped_failed = Column("with_itself_and_mate_mapped_failed", Integer)
+    properly_paired_passed = Column("properly paired_passed", Integer)
+    properly_paired_failed = Column("properly paired_failed", Integer)
+    properly_paired_passed_pct = Column("properly paired_passed_pct", Integer)
+    properly_paired_failed_pct = Column("properly paired_failed_pct", Integer)
+    with_itself_and_mate_mapped_passed = Column("with itself and mate mapped_passed", Integer)
+    with_itself_and_mate_mapped_failed = Column("with itself and mate mapped_failed", Integer)
     singletons_passed = Column("singletons_passed", Integer)
     singletons_failed = Column("singletons_failed", Integer)
-    singletons_passed_pct = Column("singletons_passed", Integer)
-    singletons_failed_pct = Column("singletons_failure_pct", Integer)
-    with_mate_mapped_to_a_different_chr_passed = Column("with_mate_mapped_to_a_different_chr_passed", Integer)
-    with_mate_mapped_to_a_different_chr_failed = Column("with_mate_mapped_to_a_different_chr_failed", Integer)
-    with_mate_mapped_to_a_different_chr_mapQ5_passed = Column("with_mate_mapped_to_a_different_chr_passed", Integer)
-    with_mate_mapped_to_a_different_chr_mapQ5_failed = Column("with_mate_mapped_to_a_different_chr_failed", Integer)
+    singletons_passed_pct = Column("singletons_passed_pct", Integer)
+    singletons_failed_pct = Column("singletons_failed_pct", Integer)
+    with_mate_mapped_to_a_different_chr_passed = Column("with mate mapped to a different chr_passed", Integer)
+    with_mate_mapped_to_a_different_chr_failed = Column("with mate mapped to a different chr_failed", Integer)
+    with_mate_mapped_to_a_different_chr_mapQ5_passed = Column("with mate mapped to a different chr (mapQ >= 5)_passed", Integer)
+    with_mate_mapped_to_a_different_chr_mapQ5_failed = Column("with mate mapped to a different chr (mapQ >= 5)_failed", Integer)
     flagstat_total = Column("flagstat_total", Integer)        
 
     #relationship
@@ -253,7 +258,7 @@ class samtools_flagstat(Base):
     )
 
     def __repr__(self):
-        return f"({self.samtools_flagstat_id} {self.total_passed} {self.total_failed} {self.secondary_passed} {self.secondary_failed} {self.supplementary_passed} \
+        return f"({self.samtools_flagstat_id} {self.Sample} {self.total_passed} {self.total_failed} {self.secondary_passed} {self.secondary_failed} {self.supplementary_passed} \
         {self.supplementary_failed} {self.duplicates_passed} {self.duplicates_failed} {self.mapped_passed} {self.mapped_failed} {self.mapped_passed_pct} \
         {self.mapped_failed_pct} {self.paired_in_sequencing_passed} {self.paired_in_sequencing_failed} {self.read1_passed} {self.read1_failed} {self.read2_passed} \
         {self.read2_failed} {self.properly_paired_passed} {self.properly_paired_failed} {self.properly_paired_passed_pct} {self.properly_paired_failed_pct} \
@@ -283,29 +288,55 @@ class Picard_markduplicates(Base):
         'Quality_files', back_populates='pmdid'
     )
 
+    fsampleid = relationship('FastQC', back_populates="fastQC_table_sam")
+
 def __repr__(self):
         return f"({self.Picard_markduplicates_id} {self.Sample} {self.LIBRARY} {self.UNPAIRED_READS_EXAMINED} {self.READ_PAIRS_EXAMINED} {self.SECONDARY_OR_SUPPLEMENTARY_RDS} \
         {self.UNMAPPED_READS} {self.UNPAIRED_READ_DUPLICATES} {self.READ_PAIR_DUPLICATES} {self.READ_PAIR_OPTICAL_DUPLICATES} {self.PERCENT_DUPLICATION} \
         {self.ESTIMATED_LIBRARY_SIZE}" 
 
-
-class FastQC(Base):
+class FastQC(Base): 
     __tablename__ = "fastQC"
 
     FastQC_id = Column("FastQC_id", Integer, primary_key=True)
+    Sample = Column("Sample", String, ForeignKey("picard_markduplicates.Sample"))
+
+# relationship
+
+    fastqc_table_id =  relationship(
+        'Quality_files', back_populates='fqcid'
+    )
+
+    fastQC_table_sam = relationship(
+        'Picard_markduplicates', back_populates='fsampleid'
+    )
+
+    flsampleid = relationship('FastQC_Lanes', back_populates="FastQCL_table")
+
+    # link FastQC table to FastQC_lanes
+
+def __repr__(self):
+    return f"({self.FastQC_id} {self.Sample})"
+
+class FastQC_Lanes(Base):
+    __tablename__ = "fastQC_lanes"
+
+    FastQCL_id = Column("FastQCL_id", Integer, primary_key=True)
+    Sample = Column("Sample", String, ForeignKey("fastQC.Sample"))
     Filename = Column("Filename", String)
-    File_type = Column("File_type", String)
+    File_type = Column("File type", String)
     Encoding = Column("Encoding", String)
-    Total_Sequences = Column("Total_Sequences", Float)
-    Sequences_flagged_as_poor_quality = Column("Sequences_flagged_as_poor_quality", Integer)
-    Sequence_length = Column("Sequence_length", Integer)
-    GC = Column("GC", Float)
-    total_deduplicated = Column("total_deduplicated", Float)
+    Total_Sequences = Column("Total Sequences", Float)
+    Sequences_flagged_as_poor_quality = Column("Sequences flagged as poor quality", Integer)
+    Sequence_length = Column("Sequence length", Integer)
+    GC = Column("%GC", Float)
+    total_deduplicated_percentage = Column("total_deduplicated_percentage", Float)
     avg_sequence_length = Column("avg_sequence_length", Float)
-    basic_statistics = Column("basic_sataistics", String)
+    basic_statistics = Column("basic_statistics", String)
     per_base_sequence_quality = Column("per_base_sequence_quality", String)
     per_tile_sequence_quality = Column("per_tile_sequence_quality", String)
     per_sequence_quality_scores = Column("per_sequence_quality_scores", String)
+    per_sequence_gc_content = Column("per_sequence_gc_content", String)
     per_base_sequence_content = Column("per_base_sequence_content", String)
     per_base_sequence_gc_content = Column("per_base_sequence_gc_content", String)
     per_base_n_content = Column("per_base_n_content", String)
@@ -315,15 +346,17 @@ class FastQC(Base):
     adapter_content = Column("adapter_content", String)
 
 # realstionship
-    fastqc_table =  relationship(
-        'Quality_files', back_populates='fqcid'
+   
+
+    FastQCL_table = relationship(
+        'FastQC', back_populates='flsampleid'
     )
 
 
     def __repr__(self):
-        return f"({self.FastQC_id} {self.Filename} {self.File_type} {self.Encoding} {self.Total_Sequences} {self.Sequences_flagged_as_poor_quality} \
-        {self.Sequence_length} {self.GC} {self.total_deduplicated} {self.avg_sequence_length} {self.basic_statistics} {self.per_base_sequence_quality} \
-        {self.per_tile_sequence_quality} {self.per_sequence_quality_scores} {self.per_base_sequence_content} {self.per_base_sequence_gc_content} \
+        return f"({self.FastQCL_id} {self.Sample} {self.Filename} {self.File_type} {self.Encoding} {self.Total_Sequences} {self.Sequences_flagged_as_poor_quality} \
+        {self.Sequence_length} {self.GC} {self.total_deduplicated_percentage} {self.avg_sequence_length} {self.basic_statistics} {self.per_base_sequence_quality} \
+        {self.per_tile_sequence_quality} {self.per_sequence_quality_scores} {self.per_base_sequence_content} {self.per_sequence_gc_content} \
         {self.per_base_n_content} {self.sequence_length_distribution} {self.sequence_duplication_levels} {self.overrepresented_sequences} {self.adapter_content}"
 
 
@@ -361,14 +394,14 @@ with Session(engine) as session:
                          OFF_BAIT_BASES='1.1', PCT_SELECTED_BASES='1.1', PCT_OFF_BAIT='1.1', ON_BAIT_VS_SELECTED='1.1', MEAN_BAIT_COVERAGE='1.1', PCT_USABLE_BASES_ON_BAIT='1.1',\
                          PCT_USABLE_BASES_ON_TARGET='1.1', FOLD_ENRICHMENT='1.1', HS_LIBRARY_SIZE='1.1', HS_PENALTY_10X='1.1', HS_PENALTY_20X='1.1', HS_PENALTY_30X='1.1', \
                          HS_PENALTY_40X='1.1', HS_PENALTY_50X='1.1', HS_PENALTY_100X='1.1', TARGET_TERRITORY='1.1', GENOME_SIZE='1.1', TOTAL_READS='1.1', PF_READS='1.1', \
-                         PF_BASES='1.1', PF_UNIQUE_READS='1.1', PF_UQ_READS_ALIGNED='1.1', PF_BASES_ALIGNED='1.1', PF_UQ_BASES_ALIGNED='1.1', MEAN_TARGET_COVERAGE='1.1', \
+                         PF_BASES='1.1', PF_UNIQUE_READS='1.1', PF_UQ_READS_ALIGNED='1.1', PF_BASES_ALIGNED='1.1', PF_UQ_BASES_ALIGNED='1.1', PCT_PF_UQ_READS_ALIGNED='1.1', MEAN_TARGET_COVERAGE='1.1', \
                          MEDIAN_TARGET_COVERAGE='1.1', MAX_TARGET_COVERAGE='1.1', MIN_TARGET_COVERAGE='1.1', ZERO_CVG_TARGETS_PCT='1.1', PCT_EXC_DUPE='1.1', \
                          PCT_EXC_ADAPTER='1.1', PCT_EXC_MAPQ='1.1', PCT_EXC_BASEQ='1.1', PCT_EXC_OVERLAP='1.1', PCT_EXC_OFF_TARGET='1.1', FOLD_80_BASE_PENALTY='1.1', \
                          PCT_TARGET_BASES_1X='1.1', PCT_TARGET_BASES_2X='1.1', PCT_TARGET_BASES_10X='1.1', PCT_TARGET_BASES_20X='1.1', PCT_TARGET_BASES_30X='1.1', \
                          PCT_TARGET_BASES_40X='1.1', PCT_TARGET_BASES_50X='1.1', PCT_TARGET_BASES_100X='1.1', AT_DROPOUT='1.1', GC_DROPOUT='1.1', HET_SNP_SENSITIVITY='1.1', \
-                         HET_SNP_Q='1.1', SAMPLE_LIBRARY_READ_GROUP='1.1'),
+                         HET_SNP_Q='1.1', SAMPLE='1.1', LIBRARY='1.1', READ_GROUP='1.1'),
         
-        samtools_flagstat(samtools_flagstat_id='1', total_passed='1', total_failed='1', secondary_passed='1', secondary_failed='1', supplementary_passed='1', \
+        samtools_flagstat(samtools_flagstat_id='1', Sample='Sample', total_passed='1', total_failed='1', secondary_passed='1', secondary_failed='1', supplementary_passed='1', \
                           supplementary_failed='1', duplicates_passed='1', duplicates_failed='1', mapped_passed='1', mapped_failed='1', mapped_passed_pct='1', \
                           mapped_failed_pct='1', paired_in_sequencing_passed='1', paired_in_sequencing_failed='1', read1_passed='1', read1_failed='1', read2_passed='1', \
                           read2_failed='1', properly_paired_passed='1', properly_paired_failed='1', properly_paired_passed_pct='1', properly_paired_failed_pct='1', \
@@ -378,10 +411,12 @@ with Session(engine) as session:
                           
         Picard_markduplicates(Picard_markduplicates_id='1', Sample='Sample', LIBRARY='LIBRARY', UNPAIRED_READS_EXAMINED='1', READ_PAIRS_EXAMINED='1', SECONDARY_OR_SUPPLEMENTARY_RDS='1', \
                               UNMAPPED_READS='1', UNPAIRED_READ_DUPLICATES='1', READ_PAIR_DUPLICATES='1', READ_PAIR_OPTICAL_DUPLICATES='1', PERCENT_DUPLICATION='1', ESTIMATED_LIBRARY_SIZE='1'),
-                              
-        FastQC(FastQC_id='1', Filename='Filename', File_type='File_type', Encoding='Encoding', Total_Sequences='1.1', Sequences_flagged_as_poor_quality='1', \
-               Sequence_length='1', GC='1.1', total_deduplicated='1.1', avg_sequence_length='1.1', basic_statistics='stats', per_base_sequence_quality='1', \
-               per_tile_sequence_quality='1', per_sequence_quality_scores='1', per_base_sequence_content='1', per_base_sequence_gc_content='1', per_base_n_content='1', \
+
+        FastQC(FastQC_id="1", Sample='1'),
+
+        FastQC_Lanes(FastQCL_id='1', Filename='Filename', File_type='File_type', Encoding='Encoding', Total_Sequences='1.1', Sequences_flagged_as_poor_quality='1', \
+               Sequence_length='1', GC='1.1', total_deduplicated_percentage='1.1', avg_sequence_length='1.1', basic_statistics='stats', per_base_sequence_quality='1', \
+               per_tile_sequence_quality='1', per_sequence_quality_scores='1', per_base_sequence_content='1', per_sequence_gc_content='1', per_base_n_content='1', \
                sequence_length_distribution='1', sequence_duplication_levels='1', overrepresented_sequences='1', adapter_content='1')])
 
 
@@ -402,3 +437,5 @@ fastQC = parse("/home/stpuser/test_git/somatic_ngs/somaticngs_pipeline_example_q
 #need to add extra headers that were missed previously for HSMEtrics
 dups.to_sql(name='picard_markduplicates', con=engine, if_exists='append', index=False)
 HsMetrics.to_sql(name='picard_hsmetrics', con=engine, if_exists='append', index=False)
+flagstat.to_sql(name='samtools_flagstat', con=engine, if_exists='append', index=False)
+fastQC.to_sql(name='fastQC_lanes', con=engine, if_exists='append', index=False)
